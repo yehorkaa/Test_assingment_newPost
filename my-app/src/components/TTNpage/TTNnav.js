@@ -3,9 +3,10 @@ import axios from "axios";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import "./TTN.scss";
+
 const TTNNav = () => {
   const [value, setValue] = useState("");
-  const [status, setStatus] = useState("");
+  const [status, setStatus] = useState({});
   const [history, setHistory] = useState([]);
 
   const apiKey = "b0c5895bb79541db60e15e0d7332bec4";
@@ -13,6 +14,7 @@ const TTNNav = () => {
 
   useEffect(() => {
     const historyFromLocalStorage = localStorage.getItem("history");
+
     if (historyFromLocalStorage) {
       setHistory(JSON.parse(historyFromLocalStorage));
     }
@@ -39,10 +41,11 @@ const TTNNav = () => {
       console.log(error);
     }
   };
+
   const onHandleInput = (e) => {
-    console.log(e.target.value);
     setValue(e.target.value);
   };
+
   const onHandleSubmit = async (e) => {
     e.preventDefault();
     const status = await getDeliveryStatus(value);
@@ -54,7 +57,7 @@ const TTNNav = () => {
       setValue("");
     }
   };
-  
+
   const removeHistoryItem = (index) => {
     const newHistory = [...history];
     newHistory.splice(index, 1);
@@ -101,6 +104,9 @@ const TTNNav = () => {
               >
                 Get status TTN
               </button>
+              {value.trim() && !value.match(/^[0-9]{14}$/) && (
+                <div className="error-message">Incorrect TTN number</div>
+              )}
             </div>
           </Form>
         </Formik>
@@ -108,7 +114,7 @@ const TTNNav = () => {
       <div className="DisplayHistory">
         <div className="display">
           <p>Status: {status.Status} </p>
-          <p>Sent: {status.WarehouseSender}</p>
+          <p>Sent: {status.Warehouse} </p>Sender
           <p>Obtained: {status.WarehouseRecipient}</p>
         </div>
         <div className="history">
