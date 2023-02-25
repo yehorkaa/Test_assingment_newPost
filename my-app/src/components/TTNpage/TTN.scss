@@ -1,0 +1,38 @@
+.mainPage {
+  
+  .navigation {
+    display: flex;
+    flex-direction: row;
+    .navigationButton {
+    max-width: 180px;
+      button {
+        border-radius: 8px;
+        width: 100%;
+        min-height: 50px;
+      }
+    }
+  }
+
+  .TTNInputButton {
+    display: flex;
+    gap: 20px;
+    .TTNInputForm{
+        Form {
+          .TTNInput {
+            
+          }  
+        }
+    }
+  }
+
+  .DisplayHistory {
+    display: flex;
+    max-width: 600px;
+    justify-content: space-between;
+
+    .history {
+        display: flex;
+        flex-direction: column;
+    }
+  }
+}
