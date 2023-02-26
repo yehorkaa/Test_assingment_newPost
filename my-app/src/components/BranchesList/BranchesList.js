@@ -60,4 +60,5 @@ const BranchesList = () => {
   );
 };
 
+
 export default BranchesList;
