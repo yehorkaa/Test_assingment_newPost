@@ -2,13 +2,14 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
+import { Link } from "react-router-dom";
 import "./TTN.scss";
 
 const TTNNav = () => {
   const [value, setValue] = useState("");
   const [status, setStatus] = useState({});
   const [history, setHistory] = useState([]);
-
+  const [error, setError] = useState("");
   const apiKey = "b0c5895bb79541db60e15e0d7332bec4";
   const baseUrl = "https://api.novaposhta.ua/v2.0/json/";
 
@@ -19,10 +20,6 @@ const TTNNav = () => {
       setHistory(JSON.parse(historyFromLocalStorage));
     }
   }, []);
-
-  useEffect(() => {
-    localStorage.setItem("history", JSON.stringify(history));
-  }, [history]);
 
   const getDeliveryStatus = async (trackingNumber) => {
     const data = {
@@ -44,6 +41,7 @@ const TTNNav = () => {
 
   const onHandleInput = (e) => {
     setValue(e.target.value);
+    setError("");
   };
 
   const onHandleSubmit = async (e) => {
@@ -51,10 +49,14 @@ const TTNNav = () => {
     const status = await getDeliveryStatus(value);
     if (status) {
       setStatus(status);
+
       if (!history.includes(value)) {
-        setHistory([...history, value]);
+        const newHistory = [...history, value];
+        setHistory(newHistory);
+        localStorage.setItem("history", JSON.stringify(newHistory));
       }
-      setValue("");
+    } else {
+      setError(<div>This TTN does not exist, try another one</div>);
     }
   };
 
@@ -62,17 +64,22 @@ const TTNNav = () => {
     const newHistory = [...history];
     newHistory.splice(index, 1);
     setHistory(newHistory);
+    localStorage.setItem("history", JSON.stringify(newHistory));
   };
 
   return (
     <>
       <nav className="navigation">
-        <div className="navigationButton">
-          <button>Check ТТН</button>
-        </div>
-        <div className="navigationButton">
-          <button>List of branches</button>
-        </div>
+        <Link to="/">
+          <div className="navigationButton">
+            <button>Check ТТН</button>
+          </div>
+        </Link>
+        <Link to="/Branches">
+          <div className="navigationButton">
+            <button>List of branches</button>
+          </div>
+        </Link>
       </nav>
       <div className="TTNInputButton">
         <Formik
@@ -107,6 +114,7 @@ const TTNNav = () => {
               {value.trim() && !value.match(/^[0-9]{14}$/) && (
                 <div className="error-message">Incorrect TTN number</div>
               )}
+              {error && <div className="error-message">{error}</div>}
             </div>
           </Form>
         </Formik>
@@ -114,7 +122,7 @@ const TTNNav = () => {
       <div className="DisplayHistory">
         <div className="display">
           <p>Status: {status.Status} </p>
-          <p>Sent: {status.Warehouse} </p>Sender
+          <p>Sent: {status.Warehouse} </p>
           <p>Obtained: {status.WarehouseRecipient}</p>
         </div>
         <div className="history">
